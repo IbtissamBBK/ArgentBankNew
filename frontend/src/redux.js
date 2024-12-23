@@ -1,4 +1,3 @@
-// src/redux.js
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -34,10 +33,15 @@ const userSlice = createSlice({
       // Supprime le token de localStorage
       localStorage.removeItem("authToken");
     },
+    updateUserInfo(state, action) {
+      if (state.userInfo) {
+        state.userInfo.userName = action.payload.userName;
+      }
+    },
   },
 });
 
-export const { loginSuccess, loginFailure, logout } = userSlice.actions;
+export const { loginSuccess, loginFailure, logout, updateUserInfo } = userSlice.actions;
 
 // Middleware pour gérer la connexion utilisateur
 export const loginUser = (credentials) => async (dispatch) => {
@@ -48,9 +52,25 @@ export const loginUser = (credentials) => async (dispatch) => {
     );
     dispatch(loginSuccess(response.data.body));
   } catch (error) {
-    dispatch(loginFailure(error.response.data.message));
+    dispatch(loginFailure(error.response?.data?.message || "Login failed"));
   }
 };
+
+// Middleware pour mettre à jour le username
+export const updateUsername = (newUsername) => async (dispatch, getState) => {
+  const { token } = getState().user;
+  try {
+    const response = await axios.put(
+      "http://localhost:3001/api/v1/user/profile",
+      { userName: newUsername },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    dispatch(updateUserInfo(response.data.body)); // Met à jour userInfo dans Redux
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du username :", error.response?.data?.message || error.message);
+  }
+};
+
 
 // Configurez le store Redux
 const store = configureStore({
