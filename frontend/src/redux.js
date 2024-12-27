@@ -1,6 +1,8 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const API_URL = "http://localhost:3001/api/v1/user"; // URL de l'API
+
 // Slice utilisateur
 const userSlice = createSlice({
   name: "user",
@@ -33,6 +35,9 @@ const userSlice = createSlice({
       // Supprime le token de localStorage
       localStorage.removeItem("authToken");
     },
+    setUserInfo(state, action) {
+      state.userInfo = action.payload;
+    },
     updateUserInfo(state, action) {
       if (state.userInfo) {
         state.userInfo.userName = action.payload.userName;
@@ -41,18 +46,50 @@ const userSlice = createSlice({
   },
 });
 
-export const { loginSuccess, loginFailure, logout, updateUserInfo } = userSlice.actions;
+export const { loginSuccess, loginFailure, logout, setUserInfo, updateUserInfo } =
+  userSlice.actions;
 
 // Middleware pour gérer la connexion utilisateur
 export const loginUser = (credentials) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      "http://localhost:3001/api/v1/user/login",
-      credentials
+    const response =await axios.post(`${API_URL}/login`, credentials);
+    const token = response.data.body.token;
+
+    // Sauvegarder le token
+    localStorage.setItem("authToken", token);
+
+    // Récupérer les informations utilisateur après connexion
+    const userResponse = await axios.get(`${API_URL}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Mettre à jour l'état Redux
+    dispatch(
+      loginSuccess({
+        token,
+        user: userResponse.data.body,
+      })
     );
-    dispatch(loginSuccess(response.data.body));
   } catch (error) {
     dispatch(loginFailure(error.response?.data?.message || "Login failed"));
+  }
+};
+
+// Middleware pour récupérer le profil utilisateur (si nécessaire au démarrage)
+export const fetchUserProfile = () => async (dispatch, getState) => {
+  const { token } = getState().user;
+
+  if (!token) return;
+
+  try {
+    const response = await axios.get(`${API_URL}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    dispatch(setUserInfo(response.data.body));
+  } catch (error) {
+    console.error("Erreur lors de la récupération du profil utilisateur :", error);
+    dispatch(logout());
   }
 };
 
@@ -61,22 +98,19 @@ export const updateUsername = (newUsername) => async (dispatch, getState) => {
   const { token } = getState().user;
   try {
     const response = await axios.put(
-      "http://localhost:3001/api/v1/user/profile",
+      `${API_URL}/profile`,
       { userName: newUsername },
       { headers: { Authorization: `Bearer ${token}` } }
     );
     dispatch(updateUserInfo(response.data.body)); // Met à jour userInfo dans Redux
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du username :", error.response?.data?.message || error.message);
+    console.error("Erreur mise à jour username:", error.message);
   }
 };
 
-
 // Configurez le store Redux
-const store = configureStore({
+export default configureStore({
   reducer: {
     user: userSlice.reducer,
   },
 });
-
-export default store;

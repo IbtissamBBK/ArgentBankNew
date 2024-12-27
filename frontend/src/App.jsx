@@ -46,15 +46,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signin" element={<SignInPage />} />
-         {/* Utilisation de ProtectedRoute pour sécuriser la page user */}
-         <Route
-          path="/user"
-          element={
-            <ProtectedRoute>
-              <UserPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/user" element={<ProtectedRoute><UserPage /></ProtectedRoute>}/>
       </Routes>
       <Footer />
     </>
