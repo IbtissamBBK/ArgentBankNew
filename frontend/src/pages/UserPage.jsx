@@ -26,8 +26,10 @@ const UserPage = () => {
         <h1>
           Welcome back
           <br />
-          {userInfo?.firstName} {userInfo?.lastName}!
+          {userInfo?.firstName} {userInfo?.lastName}
+          <br />
         </h1>
+
         {/* Mode édition pour le nom d'utilisateur */}
         {isEditing ? (
           <div className="edit-username-form">
@@ -40,13 +42,16 @@ const UserPage = () => {
             <button onClick={handleSave} className="edit-button">
               Save
             </button>
-            <button onClick={() => setIsEditing(false)} className="cancel-button">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="cancel-button"
+            >
               Cancel
             </button>
           </div>
         ) : (
           <button onClick={() => setIsEditing(true)} className="edit-button">
-            Edit Name
+            Edit username
           </button>
         )}
       </div>
@@ -87,4 +92,3 @@ const UserPage = () => {
 };
 
 export default UserPage;
-

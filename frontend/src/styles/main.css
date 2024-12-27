@@ -69,6 +69,13 @@ html {
     max-width: 100%;
     width: 200px;
   }
+
+  .main-nav-username {
+    margin-right: 15px;
+    font-size: 16px;
+    color: #2c3e50;
+  }
+  
   
   .hero {
     background-image: url('../assets/bank-tree.jpeg');
