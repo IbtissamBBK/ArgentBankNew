@@ -1,0 +1,110 @@
+swagger: '2.0'
+info:
+  title: Bank Argent Transactions API
+  description: API documentation for managing user transactions
+  version: '1.0.0'
+  termsOfService: 'http://swagger.io/terms/'
+host: localhost:3001
+basePath: /api/v1
+schemes:
+  - http
+
+paths:
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Retrieve all transactions for the current month
+      description: Fetches all transactions for a specific account for the current month.
+      parameters:
+        - name: accountId
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: List of transactions successfully retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        '400':
+          description: Invalid account ID provided
+        '500':
+          description: Server error
+
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Retrieve details of a specific transaction
+      description: Fetches detailed information about a specific transaction using its ID.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Transaction details successfully retrieved
+          schema:
+            $ref: '#/definitions/Transaction'
+        '404':
+          description: Transaction not found
+        '500':
+          description: Server error
+
+    put:
+      tags:
+        - Transactions
+      summary: Update transaction information
+      description: Updates the details of a specific transaction.
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Transaction update payload
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionUpdate'
+      responses:
+        '200':
+          description: Transaction updated successfully
+        '400':
+          description: Invalid input data
+        '404':
+          description: Transaction not found
+        '500':
+          description: Server error
+
+definitions:
+  Transaction:
+    type: object
+    properties:
+      id:
+        type: string
+      accountId:
+        type: string
+      date:
+        type: string
+        format: date
+      description:
+        type: string
+      amount:
+        type: number
+      balance:
+        type: number
+
+  TransactionUpdate:
+    type: object
+    properties:
+      description:
+        type: string
+      amount:
+        type: number
+    required:
+      - description
+      - amount
