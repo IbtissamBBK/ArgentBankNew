@@ -4,7 +4,7 @@ import axios from "axios";
 const API_URL = "http://localhost:3001/api/v1/user"; // URL de l'API
 
 // Slice utilisateur
-const userSlice = createSlice({
+const userSlice = createSlice({ // Crée un slice Redux pour gérer les informations utilisateur 
   name: "user",
   initialState: {
     isLoggedIn: !!localStorage.getItem("authToken"), // Vérifie si un token existe
@@ -12,27 +12,24 @@ const userSlice = createSlice({
     userInfo: null, // Les informations utilisateur ne sont pas chargées au démarrage
     error: null,
   },
-  reducers: {
+  reducers: { // Reducers pour gérer les actions Redux 
     loginSuccess(state, action) {
       state.isLoggedIn = true;
       state.token = action.payload.token;
       state.userInfo = action.payload.user;
       state.error = null;
-      // Sauvegarde le token dans localStorage
       localStorage.setItem("authToken", action.payload.token);
     },
     loginFailure(state, action) {
       state.isLoggedIn = false;
       state.token = null;
       state.error = action.payload;
-      // Supprime le token en cas d'erreur
       localStorage.removeItem("authToken");
     },
     logout(state) {
       state.isLoggedIn = false;
       state.token = null;
       state.userInfo = null;
-      // Supprime le token de localStorage
       localStorage.removeItem("authToken");
     },
     setUserInfo(state, action) {
@@ -49,23 +46,28 @@ const userSlice = createSlice({
 export const { loginSuccess, loginFailure, logout, setUserInfo, updateUserInfo } =
   userSlice.actions;
 
-// Middleware pour gérer la connexion utilisateur
+  
+// Middleware : connexion utilisateur 
 export const loginUser = (credentials) => async (dispatch) => {
   try {
     const response =await axios.post(`${API_URL}/login`, credentials);
     const token = response.data.body.token;
 
-    // Sauvegarder le token
-    localStorage.setItem("authToken", token);
-    await dispatch(fetchUserProfile()); // Récupère le profil utilisateur après connexion réussie 
+    // Récupérer le profil utilisateur directement
+    const userResponse = await axios.get(`${API_URL}/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    dispatch(loginSuccess({ token, user: userResponse.data.body }));
   } catch (error) {
     dispatch(loginFailure(error.response?.data?.message || "Login failed"));
   }
 };
 
-// Middleware pour récupérer le profil utilisateur (si nécessaire au démarrage)
+
+// Middleware : récupère le profil utilisateur
 export const fetchUserProfile = () => async (dispatch, getState) => {
-  const token = getState().user || localStorage.getItem("authToken"); // Récupère le token
+  const { token } = getState().user; // Récupère le token
 
   if (!token) return;
 
@@ -81,12 +83,12 @@ export const fetchUserProfile = () => async (dispatch, getState) => {
   }
 };
 
-// Middleware pour mettre à jour le username
+
+// Middleware : mise à jour du nom d'utilisateur
 export const updateUsername = (newUsername) => async (dispatch, getState) => {
   const { token } = getState().user;
   try {
-    const response = await axios.put(
-      `${API_URL}/profile`,
+    const response = await axios.put(`${API_URL}/profile`,
       { userName: newUsername },
       { headers: { Authorization: `Bearer ${token}` } }
     );
