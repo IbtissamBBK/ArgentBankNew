@@ -57,19 +57,7 @@ export const loginUser = (credentials) => async (dispatch) => {
 
     // Sauvegarder le token
     localStorage.setItem("authToken", token);
-
-    // Récupérer les informations utilisateur après connexion
-    const userResponse = await axios.get(`${API_URL}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Mettre à jour l'état Redux
-    dispatch(
-      loginSuccess({
-        token,
-        user: userResponse.data.body,
-      })
-    );
+    await dispatch(fetchUserProfile()); // Récupère le profil utilisateur après connexion réussie 
   } catch (error) {
     dispatch(loginFailure(error.response?.data?.message || "Login failed"));
   }
@@ -77,7 +65,7 @@ export const loginUser = (credentials) => async (dispatch) => {
 
 // Middleware pour récupérer le profil utilisateur (si nécessaire au démarrage)
 export const fetchUserProfile = () => async (dispatch, getState) => {
-  const { token } = getState().user;
+  const token = getState().user || localStorage.getItem("authToken"); // Récupère le token
 
   if (!token) return;
 
