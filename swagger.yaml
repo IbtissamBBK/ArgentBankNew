@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: Bank Argent Transactions API
-  description: API documentation for managing user transactions
+  title: Bank Argent API documentation
+  description: Contains all available API endpoints in this codebase, including User and Transactions modules.
   version: '1.0.0'
   termsOfService: 'http://swagger.io/terms/'
 host: localhost:3001
@@ -9,36 +9,150 @@ basePath: /api/v1
 schemes:
   - http
 
+# SECURITY DEFINITIONS
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+# USER MODULE
 paths:
+  /user/login:
+    post:
+      tags:
+        - User Module
+      summary: Login
+      description: API for user login
+      parameters:
+        - in: body
+          name: body
+          description: Login Payload
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Login successful
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        '400':
+          description: Invalid credentials
+        '500':
+          description: Server error
+
+  /user/signup:
+    post:
+      tags:
+        - User Module
+      summary: Signup
+      description: API for user registration
+      parameters:
+        - in: body
+          name: body
+          description: Signup Payload
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid input data
+        '500':
+          description: Server error
+
+  /user/profile:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Fetch User Profile
+      description: API for retrieving user profile information
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid request
+        '500':
+          description: Server error
+
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: Update User Profile
+      description: API for updating user profile information
+      parameters:
+        - in: body
+          name: body
+          description: Update payload for user profile
+          required: true
+          schema:
+            $ref: '#/definitions/UserProfile'
+      responses:
+        '200':
+          description: Profile updated successfully
+        '400':
+          description: Invalid input data
+        '500':
+          description: Server error
+
+# TRANSACTIONS MODULE
   /transactions:
     get:
+      security:
+        - Bearer: []
       tags:
         - Transactions
-      summary: Retrieve all transactions for the current month
-      description: Fetches all transactions for a specific account for the current month.
+      summary: Get transactions for the current month by account
+      description: Returns transactions for the current month. Use accountId to filter by a specific account.
       parameters:
         - name: accountId
           in: query
-          required: true
+          required: false
           type: string
+          description: Filter transactions for a specific account.
       responses:
         '200':
-          description: List of transactions successfully retrieved
+          description: Transactions successfully retrieved and grouped by account
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Transaction'
+            type: object
+            properties:
+              accounts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    accountId:
+                      type: string
+                    transactions:
+                      type: array
+                      items:
+                        $ref: '#/definitions/Transaction'
         '400':
-          description: Invalid account ID provided
+          description: Invalid account ID
         '500':
           description: Server error
 
   /transactions/{transactionId}:
     get:
+      security:
+        - Bearer: []
       tags:
         - Transactions
-      summary: Retrieve details of a specific transaction
-      description: Fetches detailed information about a specific transaction using its ID.
+      summary: Retrieve details of a specific transaction by ID
+      description: Fetch detailed information for a specific transaction by ID.
       parameters:
         - name: transactionId
           in: path
@@ -46,7 +160,7 @@ paths:
           type: string
       responses:
         '200':
-          description: Transaction details successfully retrieved
+          description: Transaction details retrieved successfully
           schema:
             $ref: '#/definitions/Transaction'
         '404':
@@ -55,10 +169,12 @@ paths:
           description: Server error
 
     put:
+      security:
+        - Bearer: []
       tags:
         - Transactions
       summary: Update transaction information
-      description: Updates the details of a specific transaction.
+      description: Modify the details of a specific transaction, like the category and note.
       parameters:
         - name: transactionId
           in: path
@@ -66,7 +182,7 @@ paths:
           type: string
         - in: body
           name: body
-          description: Transaction update payload
+          description: Transaction update payload, including modifications for category and note.
           required: true
           schema:
             $ref: '#/definitions/TransactionUpdate'
@@ -80,13 +196,66 @@ paths:
         '500':
           description: Server error
 
+# DEFINITIONS
 definitions:
+  User:
+    properties:
+      email:
+        type: string
+        description: User's email
+      password:
+        type: string
+        description: User's password
+      firstName:
+        type: string
+        description: User's first name
+      lastName:
+        type: string
+        description: User's last name
+      userName:
+        type: string
+        description: Public user name
+
+  Login:
+    properties:
+      email:
+        type: string
+        description: User's email
+      password:
+        type: string
+        description: User's password
+
+  ApiResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      body:
+        type: object
+        properties:
+          id:
+            type: string
+          email:
+            type: string
+
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+
+  UserProfile:
+    type: object
+    properties:
+      userName:
+        type: string
+
   Transaction:
     type: object
     properties:
       id:
-        type: string
-      accountId:
         type: string
       date:
         type: string
@@ -95,8 +264,11 @@ definitions:
         type: string
       amount:
         type: number
-      balance:
-        type: number
+      category:
+        type: string
+      note:
+        type: string
+
 
   TransactionUpdate:
     type: object
@@ -105,6 +277,12 @@ definitions:
         type: string
       amount:
         type: number
+      category:
+        type: string
+        description: Updated category for the transaction.
+      note:
+        type: string
+        description: Allows the user to add or modify a personal note for the transaction.
     required:
       - description
       - amount
