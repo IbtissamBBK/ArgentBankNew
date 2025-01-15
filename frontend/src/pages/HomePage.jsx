@@ -3,6 +3,7 @@ import React from "react";
 import chatIcon from "../assets/icon-chat.webp";
 import moneyIcon from "../assets/icon-money.webp";
 import securityIcon from "../assets/icon-security.webp";
+import Features from "../components/Features.jsx";
 
 
 import "../styles/main.css";
