@@ -1,9 +1,16 @@
+:root {
+  --primary-color: #00bc77;
+  --secondary-color: #2c3e50;
+  --white: #fff;
+  --dark-bg: #12002b;
+}
+
 html {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
+    color: var(--secondary-color);
   }
   
   body {
@@ -18,7 +25,7 @@ html {
   }
   
   .bg-dark {
-    background-color: #12002b;
+    background-color: var(--dark-bg);
     padding-bottom: 2rem;
     padding-top: 2rem;
   }
@@ -44,11 +51,10 @@ html {
     padding: 5px 20px;
   }
   
-  .main-nav a {
-    font-weight: bold;
-    color: #2c3e50;
-  }
-  
+  .main-nav a, .main-nav-username {
+    color: var(--secondary-color);
+}
+
   .main-nav a.router-link-exact-active {
     color: #42b983;
   }
@@ -72,13 +78,6 @@ html {
     width: 200px;
   }
 
-  .main-nav-username {
-    margin-right: 15px;
-    font-size: 16px;
-    color: #2c3e50;
-  }
-  
-  
   .hero {
     background-image: url('../assets/bank-tree.webp');
     background-position: 0 -50px;
@@ -92,7 +91,7 @@ html {
     position: relative;
     top: 2rem;
     width: 200px;
-    background: white;
+    background: var(--white);
     padding: 2rem;
     text-align: left;
     margin: 0 auto;
@@ -109,43 +108,14 @@ html {
     font-size: 0.9rem;
   }
   
-  @media (min-width: 920px) {
-    .hero {
-      height: 400px;
-      background-position: 0% 33%;
-    }
-  
-    .hero-content {
-      position: absolute;
-      top: 50px;
-      right: 50px;
-      width: 300px;
-      margin: 2rem;
-    }
-  
-    .hero-content .subtitle {
-      font-size: 1.5rem;
-    }
-  
-    .hero-content .text {
-      font-size: 1.2rem;
-    }
-  }
-  
   .features {
     display: flex;
     flex-direction: column;
   }
   
-  @media (min-width: 920px) {
-    .features {
-      flex-direction: row;
-    }
-  }
-  
   .feature-icon {
     width: 100px;
-    border: 10px solid #00bc77;
+    border: 10px solid var(--primary-color);
     border-radius: 50%;
     padding: 1rem;
   }
@@ -169,14 +139,14 @@ html {
     font-size: 1.1rem;
     font-weight: bold;
     margin-top: 1rem;
-    border-color: #00bc77;
-    background-color: #00bc77;
-    color: #fff;
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
   }
   
   .sign-in-content {
     box-sizing: border-box;
-    background-color: white;
+    background-color: var(--white);
     width: 300px;
     margin: 0 auto;
     margin-top: 3rem;
@@ -228,7 +198,7 @@ html {
     justify-content: space-between;
     align-items: center;
     border: 1px solid black;
-    background-color: #fff;
+    background-color: var(--white);
     width: 80%;
     margin: 0 auto;
     flex-direction: column;
@@ -261,15 +231,15 @@ html {
   }
   
   .edit-button {
-    border-color: #00bc77;
-    background-color: #00bc77;
-    color: #fff;
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
     font-weight: bold;
     padding: 10px;
   }
   
   .header {
-    color: #fff;
+    color: var(--white);
     margin-bottom: 2rem;
   }
   
@@ -280,9 +250,9 @@ html {
     font-size: 1.1rem;
     font-weight: bold;
     margin-top: 1rem;
-    border-color: #00bc77;
-    background-color: #00bc77;
-    color: #fff;
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
   }
   
   @media (min-width: 720px) {
@@ -299,3 +269,29 @@ html {
     }
   }
   
+  @media (min-width: 920px) {
+    .hero {
+      height: 400px;
+      background-position: 0% 33%;
+    }
+  
+    .hero-content {
+      position: absolute;
+      top: 50px;
+      right: 50px;
+      width: 300px;
+      margin: 2rem;
+    }
+  
+    .hero-content .subtitle {
+      font-size: 1.5rem;
+    }
+  
+    .hero-content .text {
+      font-size: 1.2rem;
+    }
+
+    .features {
+      flex-direction: row;
+    }
+  }
