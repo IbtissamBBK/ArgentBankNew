@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginUser} from "../redux";
+import { isLoggedIn, loginUser } from "../redux";
 import "../styles/main.css";
 
 const SignInPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoggedIn, userInfo, error } = useSelector((state) => state.user);
+  const { userInfo, error } = useSelector((state) => state.user);
+  const userIsLoggedIn = useSelector(isLoggedIn);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,14 +19,11 @@ const SignInPage = () => {
 
   // Redirection après connexion réussie
   useEffect(() => {
-    if (isLoggedIn && userInfo) {
+    if (userIsLoggedIn && userInfo) {
       navigate("/user"); // Redirige après connexion réussie
     }
 
-console.log("isLoggedIn:", isLoggedIn);
-console.log("userInfo:", userInfo);
-
-  }, [isLoggedIn, userInfo, navigate]);
+  }, [userIsLoggedIn, userInfo, navigate]);
 
   return (
     <main className="main bg-dark">

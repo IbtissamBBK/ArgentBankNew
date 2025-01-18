@@ -5,11 +5,13 @@ import { logout } from "../redux";
 import logo from "../assets/argentBankLogo.webp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { isLoggedIn } from "../redux";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoggedIn, userInfo } = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.user);
+  const userIsLoggedIn = useSelector(isLoggedIn);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -23,7 +25,7 @@ const Header = () => {
         <h1 className="sr-only">Argent Bank</h1>
       </Link>
       <div>
-        {isLoggedIn && userInfo ? (
+        {userIsLoggedIn && userInfo ? (
           <>
             {/* Affiche le username à côté du bouton logout */}
             <span className="main-nav-username">
